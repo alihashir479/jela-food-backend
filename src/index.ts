@@ -4,6 +4,7 @@ import 'dotenv/config'
 import mongoose from 'mongoose'
 import myUserRoute from './routes/MyUserRoute'
 import myResturantRoute from './routes/MyResturantRoute'
+import resturantRoute from './routes/ResturantRoute'
 import { v2 as cloudinary } from 'cloudinary'
 
 const app = express()
@@ -20,6 +21,7 @@ cloudinary.config({
 
 app.use('/api/my/user/', myUserRoute)
 app.use('/api/my/resturant', myResturantRoute)
+app.use('/api/resturant', resturantRoute)
 
 app.get('/health', (req: Request, res: Response) => {
   res.json({ message: 'Health is ok' })
