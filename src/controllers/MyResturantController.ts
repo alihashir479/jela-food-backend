@@ -7,7 +7,6 @@ const createMyResturant = async (
   res: Response
 ): Promise<any> => {
   try {
-    console.log('Create my resturant')
     const existingResturant = await Resturant.findOne({ user: req.userId });
     if (existingResturant) {
       return res.status(409).json({ message: "Resturant already exists" });

@@ -65,4 +65,18 @@ const searchResturant = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-export { searchResturant };
+const getResturant = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const resturantId = req.params.resturantId
+    const resturant = await Resturant.findById(resturantId)
+    if(!resturant) {
+      return res.status(404).json({ message: 'No resturant found!' })
+    }
+    res.json(resturant)
+  }
+  catch(err) {
+    res.status(500).json({ message: 'Error fetching resturant!'})
+  }
+}
+
+export { searchResturant, getResturant };
