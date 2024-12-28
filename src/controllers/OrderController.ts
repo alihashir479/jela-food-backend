@@ -7,6 +7,16 @@ const stripe = new Stripe(process.env.STRIPE_API_KEY as string);
 const FRONTEND_URL = process.env.FRONTEND_URL as string;
 const STRIPE_WEBHOOK_SECRET_KEY = process.env.STRIPE_WEBHOOK_SECRET as string
 
+export const getMyOrders = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const orders = await Order.find({ user: req.userId}).populate('resturant').populate('user')
+    res.json(orders)
+  }
+  catch(err) {
+    res.status(500).json({ message: 'Error fetching orders'})
+  }
+} 
+
 type SessionRequestType = {
   cartItems: {
     menuItemId: string;

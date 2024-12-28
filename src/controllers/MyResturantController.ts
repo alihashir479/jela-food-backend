@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import cloudinary from "cloudinary";
 import Resturant from "../models/Resturant";
 import mongoose from "mongoose";
+import Order from "../models/Order";
 const createMyResturant = async (
   req: Request,
   res: Response
@@ -66,6 +67,44 @@ const updateMyResturant = async(req: Request, res: Response): Promise<any> => {
   }
 }
 
+const getMyResturantOrders = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const resturant = await Resturant.findOne({ user: req.userId})
+    if(!resturant) {
+      return res.status(404).json({message: 'Resturant not found'})
+    }
+    const orders = await Order.find({ resturant: resturant.id}).populate('resturant').populate('user')
+    res.json(orders)
+  }
+  catch(err) {
+    res.status(500).json({message: 'Error getting my resturant orders!'})
+  }
+}
+
+const updateOrderStatus = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const { orderId } = req.params
+    const { status } = req.body
+
+    const order = await Order.findById(orderId)
+    if(!order) {
+      return res.status(404).json({ message: 'Order not found'})
+    }
+
+    const resturant = await Resturant.findById(order.resturant)
+    if(resturant && resturant.user?.toString() !== req.userId) {
+      res.status(401).send()
+    }
+
+    order.status = status
+    await order.save()
+    res.status(200).json(order)
+  }
+  catch(err) {
+    res.status(500).json({ message: 'Unable to update order status'})
+  }
+}
+
 const uploadImageToCloudinary = async (file: Express.Multer.File) => {
   const image = file
   const base64Image = Buffer.from(image.buffer).toString("base64");
@@ -75,4 +114,4 @@ const uploadImageToCloudinary = async (file: Express.Multer.File) => {
   return uploadResponse.url
 }
 
-export { createMyResturant, getMyResturant, updateMyResturant };
+export { createMyResturant, getMyResturant, updateMyResturant, getMyResturantOrders, updateOrderStatus };
